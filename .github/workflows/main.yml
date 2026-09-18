@@ -48,6 +48,8 @@ jobs:
       - name: Build APK
         run: |
           cd "$PROJECT_DIR"
+          echo "android.useAndroidX=true" >> gradle.properties
+          echo "android.enableJetifier=true" >> gradle.properties
           gradle :app:assembleDebug --no-daemon
 
       - name: Upload APK
