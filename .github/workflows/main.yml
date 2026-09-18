@@ -1,4 +1,4 @@
-name: Build TelegramGroupManager APK
+name: Build Add Member Group Syndicate 411
 
 on:
   workflow_dispatch:
@@ -11,7 +11,7 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Checkout
+      - name: Checkout repository
         uses: actions/checkout@v4
 
       - name: Set up JDK 17
@@ -29,32 +29,36 @@ jobs:
         run: |
           ANDROID_HOME="${ANDROID_HOME:-/usr/local/lib/android/sdk}"
           SDKMANAGER="$(find "$ANDROID_HOME" -type f -name sdkmanager -print -quit)"
-
           if [ -z "$SDKMANAGER" ]; then
             echo "sdkmanager tidak ditemukan"
             exit 1
           fi
-
-          echo "Menggunakan sdkmanager: $SDKMANAGER"
           yes | "$SDKMANAGER" --licenses > /dev/null || true
           "$SDKMANAGER" "platform-tools" "platforms;android-36" "build-tools;36.0.0"
 
-      - name: Extract project
+      - name: Extract final project
         run: |
-          unzip -q TelegramGroupManager_CloudBuild_Android16.zip -d project
-          PROJECT_DIR=$(find project -type f \( -name settings.gradle.kts -o -name settings.gradle \) -print -quit | xargs dirname)
-          echo "PROJECT_DIR=$PROJECT_DIR" >> "$GITHUB_ENV"
+          test -f "AddMemberGroupSyndicate411_FINAL_Android13Plus.zip"
+          rm -rf project
+          mkdir project
+          unzip -q "AddMemberGroupSyndicate411_FINAL_Android13Plus.zip" -d project
+          test -f project/settings.gradle.kts
+          test -f project/app/build.gradle.kts
+
+      - name: Configure AndroidX
+        run: |
+          cd project
+          grep -q "^android.useAndroidX=true" gradle.properties || echo "android.useAndroidX=true" >> gradle.properties
+          grep -q "^android.enableJetifier=true" gradle.properties || echo "android.enableJetifier=true" >> gradle.properties
 
       - name: Build APK
         run: |
-          cd "$PROJECT_DIR"
-          echo "android.useAndroidX=true" >> gradle.properties
-          echo "android.enableJetifier=true" >> gradle.properties
-          gradle :app:assembleDebug --no-daemon -Pkotlin.jvm.target.validation.mode=warning
+          cd project
+          gradle :app:assembleDebug --no-daemon --stacktrace
 
       - name: Upload APK
         uses: actions/upload-artifact@v4
         with:
-          name: TelegramGroupManager-APK
-          path: "**/app/build/outputs/apk/debug/app-debug.apk"
+          name: AddMemberGroupSyndicate411-APK
+          path: project/app/build/outputs/apk/debug/app-debug.apk
           if-no-files-found: error
