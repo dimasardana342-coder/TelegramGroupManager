@@ -38,10 +38,10 @@ jobs:
 
       - name: Extract final project
         run: |
-          test -f "AddMemberGroupSyndicate411_FINAL_Android13Plus_FIXED_READY.zip"
+          test -f "AddMemberGroupSyndicate411_FINAL_Android13Plus_FIXED_READY_LEGACY_TDLIB.zip"
           rm -rf project
           mkdir project
-          unzip -q "AddMemberGroupSyndicate411_FINAL_Android13Plus_FIXED_READY.zip" -d project
+          unzip -q "AddMemberGroupSyndicate411_FINAL_Android13Plus_FIXED_READY_LEGACY_TDLIB.zip" -d project
           test -f project/settings.gradle.kts
           test -f project/app/build.gradle.kts
 
